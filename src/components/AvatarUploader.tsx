@@ -72,7 +72,7 @@ const AvatarUploader = () => {
           <span
             className={
               "text-sm font-medium " +
-              (userProfile?.photoURL ? "text-gray-700" : "text-black")
+              (userProfile?.photoURL ? "text-white" : "text-black")
             }
           >
             Edit
