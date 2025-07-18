@@ -13,7 +13,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (!userData.isLoggedIn) {
-      navigate("/");
+      void navigate("/");
     }
     const fetchUserData = async () => {
       if (userData.uid) {
@@ -23,8 +23,8 @@ const Profile = () => {
         }
       }
     };
-    fetchUserData();
-  }, [userData.uid, dispatch, userProfile.isLoaded]);
+    void fetchUserData();
+  }, [userData.isLoggedIn, userData.uid, dispatch, navigate]);
   console.log("User Data:", userData);
   if (!userProfile.isLoaded) {
     return <p>Loading user profile...</p>;

@@ -44,7 +44,7 @@ const AvatarUploader = () => {
     >
       {userProfile?.photoURL ? (
         <img
-          src={userProfile.photoURL as string}
+          src={userProfile.photoURL}
           alt="Profile"
           className="w-full h-full object-contain rounded-full"
         />
@@ -59,7 +59,9 @@ const AvatarUploader = () => {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={handleFileChange}
+        onChange={(e) => {
+          void handleFileChange(e);
+        }}
       />
 
       {hovering && (
@@ -69,9 +71,8 @@ const AvatarUploader = () => {
         >
           <span
             className={
-              "text-sm font-medium " + userProfile?.photoURL
-                ? "text-gray-700"
-                : "text-black"
+              "text-sm font-medium " +
+              (userProfile?.photoURL ? "text-gray-700" : "text-black")
             }
           >
             Edit

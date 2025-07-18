@@ -32,39 +32,48 @@ const Login = () => {
   const labelClasses = "block text-sm font-medium text-gray-700 mb-1";
   const errorClasses = "text-red-500 text-xs mt-1";
 
-  const handleSubmit = (
+  const handleSubmit = async (
     values: LoginFormValues,
     formikHelpers: FormikHelpers<LoginFormValues>
   ) => {
     const { setFieldValue } = formikHelpers;
 
-    signInWithEmailAndPassword(auth, values.email, values.password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+      const user = userCredential.user;
 
-        dispatch(
-          setUser({
-            uid: user.uid,
-            displayName: user.displayName ?? "",
-            firstName: user.displayName?.split(" ")[0] ?? "",
-            lastName: user.displayName?.split(" ")[1] ?? "",
-            email: user.email ?? values.email,
-            isLoggedIn: true,
-          })
-        );
-      })
-      .then(() => {
-        console.log("User logged in successfully");
+      dispatch(
+        setUser({
+          uid: user.uid,
+          displayName: user.displayName ?? "",
+          firstName: user.displayName?.split(" ")[0] ?? "",
+          lastName: user.displayName?.split(" ")[1] ?? "",
+          email: user.email ?? values.email,
+          isLoggedIn: true,
+        })
+      );
 
-        navigate("/home");
-      })
-      .catch((error) => {
-        console.error("Error signing up:", error);
-        const errorMessage = getFirebaseSignInAuthErrorMessage(error.code);
-        setErrorMessage(errorMessage);
-        setFieldValue("email", "");
-        setFieldValue("password", "");
-      });
+      await navigate("/home"); // safely awaited
+      console.log("User logged in successfully");
+    } catch (err: unknown) {
+      console.error("Error signing in:", err);
+
+      // Fix unsafe `any` access
+      const code =
+        typeof err === "object" && err !== null && "code" in err
+          ? String((err as { code?: unknown }).code)
+          : "auth/unknown";
+
+      const errorMessage = getFirebaseSignInAuthErrorMessage(code);
+      setErrorMessage(errorMessage);
+
+      void setFieldValue("email", "");
+      void setFieldValue("password", "");
+    }
   };
 
   return (
@@ -77,7 +86,7 @@ const Login = () => {
         initialValues={initialValues}
         validationSchema={loginSchema}
         onSubmit={(values, formikHelpers) => {
-          formikHelpers.validateForm().then((errors) => {
+          void formikHelpers.validateForm().then((errors) => {
             const fieldNames = Object.keys(loginSchema.fields);
             const hasErrors = fieldNames.some(
               (field) => errors[field as keyof LoginFormValues]
@@ -91,10 +100,10 @@ const Login = () => {
                 touchedFields[field as keyof LoginFormValues] = true;
               });
 
-              formikHelpers.setTouched(touchedFields, true);
+              void formikHelpers.setTouched(touchedFields, true);
             } else {
               console.log("Form is valid:", values);
-              handleSubmit(values, formikHelpers);
+              void handleSubmit(values, formikHelpers);
             }
           });
         }}

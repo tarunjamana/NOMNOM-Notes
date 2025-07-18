@@ -8,7 +8,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!userState.isLoggedIn) {
-      navigate("/"); // redirect to login/signup
+      void navigate("/"); // redirect to login/signup
     }
   }, [userState.isLoggedIn, navigate]);
 

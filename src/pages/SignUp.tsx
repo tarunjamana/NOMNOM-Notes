@@ -16,8 +16,9 @@ import { useAppDispatch } from "../store/hooks";
 import { setUser } from "../store/slices/userSlice";
 import { getFirebaseSignUpAuthErrorMessage } from "../utils/firebaseAuthUtils";
 import FormError from "../components/FormError";
-import { doc, setDoc, setLogLevel } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
+import { FirebaseError } from "firebase/app";
 
 const Signup = () => {
   const [step, setStep] = useState(1);
@@ -30,7 +31,6 @@ const Signup = () => {
 
   const dispatch = useAppDispatch();
 
-  setLogLevel("debug");
   const initialValues: SignupFormValues = {
     firstName: "",
     lastName: "",
@@ -103,62 +103,63 @@ const Signup = () => {
     }),
   ];
 
-  const handleSubmit = (
+  const handleSubmit = async (
     values: SignupFormValues,
     formikHelpers: FormikHelpers<SignupFormValues>
   ) => {
-    console.log("Form submitted:", values);
-    const { setFieldValue } = formikHelpers;
-    // sign up the user with Firebase
-    createUserWithEmailAndPassword(auth, values.email, values.password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        console.log("User signed up:", user);
+    try {
+      // const { setFieldValue } = formikHelpers;
 
-        dispatch(
-          setUser({
-            uid: user.uid,
-            displayName: `${values.firstName} ${values.lastName}`,
-            firstName: values.firstName,
-            lastName: values.lastName,
-            email: values.email,
-            isLoggedIn: true,
-          })
-        );
-        return Promise.all([
-          updateProfile(user, {
-            displayName: `${values.firstName} ${values.lastName}`,
-          }),
-          setDoc(doc(db, "users", user.uid), {
-            uid: user.uid,
-            firstName: values.firstName,
-            lastName: values.lastName,
-            gender: values.gender,
-            dob: values.dob,
-            height: values.height,
-            currentWeight: values.currentWeight,
-            targetWeight: values.targetWeight,
-            activityLevel: values.activityLevel,
-            email: values.email,
-            createdAt: new Date().toISOString(),
-          }).catch((firestoreError) => {
-            console.error("Error writing to Firestore:", firestoreError);
-          }),
-        ]);
-      })
-      .then(() => {
-        console.log("User signed up and profile updated successfully");
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+      const user = userCredential.user;
 
-        navigate("/home");
-      })
-      .catch((error) => {
-        console.error("Error signing up:", error);
-        const errorMessage = getFirebaseSignUpAuthErrorMessage(error.code);
+      dispatch(
+        setUser({
+          uid: user.uid,
+          displayName: `${values.firstName} ${values.lastName}`,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          isLoggedIn: true,
+        })
+      );
+
+      await Promise.all([
+        updateProfile(user, {
+          displayName: `${values.firstName} ${values.lastName}`,
+        }),
+        setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          gender: values.gender,
+          dob: values.dob,
+          height: values.height,
+          currentWeight: values.currentWeight,
+          targetWeight: values.targetWeight,
+          activityLevel: values.activityLevel,
+          email: values.email,
+          createdAt: new Date().toISOString(),
+        }),
+      ]);
+
+      void navigate("/home");
+    } catch (err: unknown) {
+      if (err instanceof FirebaseError) {
+        const errorMessage = getFirebaseSignUpAuthErrorMessage(err.code);
         setErrorMessage(errorMessage);
-        setFieldValue("email", "");
-        setFieldValue("password", "");
-      });
+      } else {
+        console.error("Unknown signup error:", err);
+        setErrorMessage("An unexpected error occurred.");
+      }
+
+      void formikHelpers.setFieldValue("email", "");
+      void formikHelpers.setFieldValue("password", "");
+    }
   };
 
   const fieldClasses =
@@ -302,9 +303,9 @@ const Signup = () => {
           setSubmitted(true);
 
           if (step === 5) {
-            handleSubmit(values, formikHelpers);
+            void handleSubmit(values, formikHelpers);
           } else {
-            formikHelpers.validateForm().then((errors) => {
+            void formikHelpers.validateForm().then((errors) => {
               const stepFields = Object.keys(stepSchemas[step - 1].fields);
               const hasStepErrors = stepFields.some(
                 (field) => errors[field as keyof SignupFormValues]
@@ -319,7 +320,7 @@ const Signup = () => {
                   touchedFields[field as keyof SignupFormValues] = true;
                 });
 
-                formikHelpers.setTouched(touchedFields, true); // second arg means "shouldValidate"
+                void formikHelpers.setTouched(touchedFields, true); // second arg means "shouldValidate"
               } else {
                 setSubmitted(false);
                 setStep((prev) => prev + 1);
