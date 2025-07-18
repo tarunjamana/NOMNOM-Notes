@@ -1,20 +1,56 @@
+import "./App.css";
+import Header from "./components/Header";
+// import Layover from "./components/Layover";
+import { createBrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+import Home from "./pages/Home";
+import { appStore } from "./store/appStore";
+import { Provider } from "react-redux";
+import AuthPage from "./pages/AuthPage";
+import Profile from "./pages/Profile";
 
-import './App.css'
-import Header from './components/Header'
-import Layover from './components/Layover'
+// Define layout wrapper to include Header in all routes
+const AppLayout = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <Header />
+    {children}
+  </>
+);
+
+// Define router with layout
+const appRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <AppLayout>
+        <AuthPage />
+      </AppLayout>
+    ),
+  },
+  {
+    path: "/home",
+    element: (
+      <AppLayout>
+        <Home />
+      </AppLayout>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <AppLayout>
+        <Profile />
+      </AppLayout>
+    ),
+  },
+]);
 
 function App() {
-
-
   return (
-    <>
-      <Layover />
-      <Header />
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <h1 className="text-4xl font-bold text-blue-600">Welcome to NOMNOM</h1>
-      </div>
-    </>
-  )
+    <Provider store={appStore}>
+      <RouterProvider router={appRouter} />
+    </Provider>
+  );
 }
 
-export default App
+export default App;
