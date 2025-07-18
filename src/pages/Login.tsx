@@ -40,7 +40,6 @@ const Login = () => {
 
     signInWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredential) => {
-        // Get fresh user data for sign in
         const user = userCredential.user;
 
         dispatch(
@@ -56,8 +55,8 @@ const Login = () => {
       })
       .then(() => {
         console.log("User logged in successfully");
-        // You can redirect or show a success message here
-        navigate("/home"); // Redirect to home page after successful login
+
+        navigate("/home");
       })
       .catch((error) => {
         console.error("Error signing up:", error);

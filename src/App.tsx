@@ -9,7 +9,6 @@ import { Provider } from "react-redux";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
 
-// Define layout wrapper to include Header in all routes
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
   <>
     <Header />
@@ -17,7 +16,6 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
   </>
 );
 
-// Define router with layout
 const appRouter = createBrowserRouter([
   {
     path: "/",

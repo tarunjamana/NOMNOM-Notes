@@ -115,7 +115,7 @@ const Signup = () => {
         // Signed in
         const user = userCredential.user;
         console.log("User signed up:", user);
-        // Update the user's profile with first and last name
+
         dispatch(
           setUser({
             uid: user.uid,
@@ -149,8 +149,8 @@ const Signup = () => {
       })
       .then(() => {
         console.log("User signed up and profile updated successfully");
-        // You can redirect or show a success message here
-        navigate("/home"); // Redirect to home page after successful signup
+
+        navigate("/home");
       })
       .catch((error) => {
         console.error("Error signing up:", error);
@@ -158,7 +158,6 @@ const Signup = () => {
         setErrorMessage(errorMessage);
         setFieldValue("email", "");
         setFieldValue("password", "");
-        // Handle errors here, e.g., show an error message to the user
       });
   };
 

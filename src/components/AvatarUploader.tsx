@@ -54,7 +54,6 @@ const AvatarUploader = () => {
         </div>
       )}
 
-      {/* Always render the file input, but keep it hidden */}
       <input
         id="avatarUpload"
         type="file"

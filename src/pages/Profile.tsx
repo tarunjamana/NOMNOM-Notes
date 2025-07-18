@@ -13,13 +13,13 @@ const Profile = () => {
 
   useEffect(() => {
     if (!userData.isLoggedIn) {
-      navigate("/"); // redirect to login/signup
+      navigate("/");
     }
     const fetchUserData = async () => {
       if (userData.uid) {
         const user = await getUserById(userData.uid);
         if (user) {
-          dispatch(setUserProfile(user)); // ✅ Safe now
+          dispatch(setUserProfile(user));
         }
       }
     };

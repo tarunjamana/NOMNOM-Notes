@@ -1,12 +1,12 @@
 export interface SignupFormValues {
     firstName: string;
     lastName: string;
-    gender: 'male' | 'female' | 'other' | ''; // enum-like
-    dob: string; // ISO string for dates, works well with <input type="date" />
-    height: number | ''; // in cm
-    currentWeight: number | ''; // in kg
-    targetWeight: number | ''; // in kg
-    activityLevel: 'low' | 'moderate' | 'active' | 'veryActive' | ''; // select options
+    gender: 'male' | 'female' | 'other' | ''; 
+    dob: string;
+    height: number | '';
+    currentWeight: number | ''; 
+    targetWeight: number | ''; 
+    activityLevel: 'low' | 'moderate' | 'active' | 'veryActive' | ''; 
     email: string;
     password: string;
 }

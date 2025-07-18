@@ -12,8 +12,8 @@ export interface UserProfile {
     firstName: string;
     lastName: string;
     gender: string;
-    dob: string; // ISO date string
-    height: string; // Keep as string since Firestore stores it that way
+    dob: string; 
+    height: string; 
     currentWeight: string;
     targetWeight: string;
     activityLevel: string;
