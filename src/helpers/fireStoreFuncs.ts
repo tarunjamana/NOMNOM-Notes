@@ -1,4 +1,4 @@
-import { doc, getDoc , updateDoc } from "firebase/firestore";
+import { doc, getDoc , updateDoc,DocumentData,WithFieldValue,DocumentReference } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import { UserProfile } from "../types/user";
 
@@ -40,26 +40,27 @@ export const updateUserAvatarInFirestore = async (uid: string, photoURL: string)
   await updateDoc(userRef, { photoURL });
 }
  
-// utils/firestoreHelpers.ts
-export const updateEditableFields = async (
+export const updateEditableFields = async <T extends DocumentData>(
   collectionName: string,
   docId: string,
-  currentValues: Record<string, unknown>,
-  initialValues: Record<string, unknown>,
-  editableConfig: Record<string, boolean>
-) => {
-  console.log("initalValues", initialValues);
-  console.log("currentValues", currentValues);
-  const updates = Object.keys(currentValues).reduce((acc, key) => {
+  currentValues: T,
+  initialValues: T,
+  editableConfig: Partial<Record<keyof T, boolean>>
+): Promise<Partial<T>> => {
+  const updates: Partial<T> = {};
+
+  // Type-safe iteration over editable fields only
+  (Object.keys(editableConfig) as Array<keyof T>).forEach((key) => {
     if (editableConfig[key] && currentValues[key] !== initialValues[key]) {
-      acc[key] = currentValues[key];
+      updates[key] = currentValues[key];
     }
-    return acc;
-  }, {} as Record<string, unknown>);
+  });
 
   if (Object.keys(updates).length > 0) {
-    await updateDoc(doc(db, collectionName, docId), updates);
+    // Create a properly typed document reference
+    const docRef = doc(db, collectionName, docId) as DocumentReference<T>;
+    await updateDoc(docRef, updates as WithFieldValue<T>);
   }
 
-  return updates; // Return the fields that were updated
+  return updates;
 };

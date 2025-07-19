@@ -12,7 +12,7 @@ type FieldConfig<T> = {
   options?: { value: string; label: string }[];
 };
 
-type EditableSectionProps<T extends Record<string, any>> = {
+type EditableSectionProps<T extends Record<string, unknown>> = {
   title: string;
   fields: FieldConfig<T>[];
   initialValues: T;
@@ -21,7 +21,7 @@ type EditableSectionProps<T extends Record<string, any>> = {
   onSave: (values: T) => Promise<void> | void;
 };
 
-export const EditableSection = <T extends Record<string, any>>({
+export const EditableSection = <T extends Record<string, unknown>>({
   title,
   fields,
   initialValues,
@@ -37,6 +37,7 @@ export const EditableSection = <T extends Record<string, any>>({
       setIsOpen(false);
     } catch (error) {
       actions.setSubmitting(false);
+      console.error("A error has occured", error);
     }
   };
 
@@ -95,7 +96,7 @@ export const EditableSection = <T extends Record<string, any>>({
 
                         {!editableConfig[field.name] ? (
                           <div className="px-3 py-2 bg-gray-50 rounded-md border border-gray-200 text-gray-700">
-                            {values[field.name] ||
+                            {values[field.name]?.toString() ||
                               `No ${field.label.toLowerCase()} provided`}
                           </div>
                         ) : field.type === "tel" ? (
@@ -111,7 +112,7 @@ export const EditableSection = <T extends Record<string, any>>({
                               defaultCountry="IN"
                               value={values[field.name] as string}
                               onChange={(value) =>
-                                setFieldValue(field.name.toString(), value)
+                                void setFieldValue(field.name.toString(), value)
                               }
                               className="w-full p-2 bg-transparent"
                             />
