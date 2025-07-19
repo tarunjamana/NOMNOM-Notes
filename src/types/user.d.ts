@@ -22,6 +22,11 @@ export interface UserProfile {
     updatedAt?: string;
     photoURL?: string;
     bio?: string;
+    interests?: string[];
     [key: string]: unknown; // Support for future dynamic fields
   }
   
+  export type Interest = {
+    id: string;
+    name: string;
+  };

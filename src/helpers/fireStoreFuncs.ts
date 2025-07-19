@@ -1,4 +1,4 @@
-import { collection, doc, getDoc , updateDoc } from "firebase/firestore";
+import { doc, getDoc , updateDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import { UserProfile } from "../types/user";
 
@@ -44,8 +44,8 @@ export const updateUserAvatarInFirestore = async (uid: string, photoURL: string)
 export const updateEditableFields = async (
   collectionName: string,
   docId: string,
-  currentValues: Record<string, any>,
-  initialValues: Record<string, any>,
+  currentValues: Record<string, unknown>,
+  initialValues: Record<string, unknown>,
   editableConfig: Record<string, boolean>
 ) => {
   console.log("initalValues", initialValues);
@@ -55,7 +55,7 @@ export const updateEditableFields = async (
       acc[key] = currentValues[key];
     }
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, unknown>);
 
   if (Object.keys(updates).length > 0) {
     await updateDoc(doc(db, collectionName, docId), updates);

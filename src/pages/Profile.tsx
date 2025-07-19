@@ -10,6 +10,10 @@ import AvatarUploader from "../components/AvatarUploader";
 import { EditableSection } from "../components/EditableSection";
 import * as Yup from "yup";
 import { updateEditableFields } from "../helpers/fireStoreFuncs";
+import InterestsSection from "../components/InterestsSection";
+import { updateDoc, doc } from "firebase/firestore";
+import { db } from "../utils/firebase";
+
 const Profile = () => {
   const userData = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -25,29 +29,35 @@ const Profile = () => {
     bio: string;
   };
 
-  const personalInfoSchema = Yup.object().shape({
-    phone: Yup.string()
-      .test(
-        "phone-or-bio",
-        "Either phone or bio must be provided",
-        function (value) {
-          return !!value || !!this.parent.bio;
-        }
-      )
-      .test("valid-phone", "Invalid phone number", (value) => {
-        if (!value) return true;
-        return value.replace(/\D/g, "").length >= 10;
-      }),
-    bio: Yup.string()
-      .max(300, "Bio must be less than 300 characters")
-      .test(
-        "phone-or-bio",
-        "Either phone or bio must be provided",
-        function (value) {
-          return !!value || !!this.parent.phone;
-        }
-      ),
-  }) as Yup.ObjectSchema<Partial<PersonalInfo>>;
+  const personalInfoSchema: Yup.ObjectSchema<Partial<PersonalInfo>> =
+    Yup.object({
+      fullName: Yup.string(),
+      gender: Yup.string(),
+      dateOfBirth: Yup.string(),
+      phone: Yup.string()
+        .test(
+          "phone-or-bio",
+          "Either phone or bio must be provided",
+          function (value) {
+            const parent = this.parent as Partial<PersonalInfo>;
+            return !!value || !!parent.bio;
+          }
+        )
+        .test("valid-phone", "Invalid phone number", (value) => {
+          if (!value) return true;
+          return value.replace(/\D/g, "").length >= 10;
+        }),
+      bio: Yup.string()
+        .max(300, "Bio must be less than 300 characters")
+        .test(
+          "phone-or-bio",
+          "Either phone or bio must be provided",
+          function (value) {
+            const parent = this.parent as Partial<PersonalInfo>;
+            return !!value || !!parent.phone;
+          }
+        ),
+    });
 
   useEffect(() => {
     if (!userData.isLoggedIn) {
@@ -292,6 +302,22 @@ const Profile = () => {
               );
               console.log(updates);
               dispatch(updateUserProfile(updates));
+            }}
+          />
+        </div>
+        {/* Interests and fitness goals */}
+        <div className="w-full mb-6 border relative border-gray-100 rounded-lg p-4 shadow-sm">
+          <InterestsSection
+            initialInterests={userProfile.profile?.interests || []}
+            onSave={async (selectedInterests) => {
+              try {
+                await updateDoc(doc(db, "users", userData.uid), {
+                  interests: selectedInterests,
+                });
+                dispatch(updateUserProfile({ interests: selectedInterests }));
+              } catch (error) {
+                console.error("Error Saving interests", error);
+              }
             }}
           />
         </div>
