@@ -4,10 +4,11 @@ import Header from "./components/Header";
 import { createBrowserRouter } from "react-router-dom";
 import { RouterProvider } from "react-router-dom";
 import Home from "./pages/Home";
-import { appStore } from "./store/appStore";
+import { appStore, persistor } from "./store/appStore";
 import { Provider } from "react-redux";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
+import { PersistGate } from "redux-persist/integration/react";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -46,7 +47,9 @@ const appRouter = createBrowserRouter([
 function App() {
   return (
     <Provider store={appStore}>
-      <RouterProvider router={appRouter} />
+      <PersistGate loading={null} persistor={persistor}>
+        <RouterProvider router={appRouter} />
+      </PersistGate>
     </Provider>
   );
 }

@@ -3,6 +3,7 @@ import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { Link } from "react-router-dom";
 import { clearUser } from "../store/slices/userSlice";
 import { clearUserProfile } from "../store/slices/userProfileSlice";
+import { persistor } from "../store/appStore";
 
 const Header = () => {
   const userState = useAppSelector((state) => state.user);
@@ -24,11 +25,29 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleClick = () => {
-    // Handle logout logic here
-    dispatch(clearUser());
-    dispatch(clearUserProfile());
-    setShowMenu(false);
+  const handleLogout = async () => {
+    try {
+      // Clear Redux state
+      dispatch(clearUser());
+      dispatch(clearUserProfile());
+
+      // Purge persisted state
+      await persistor.purge();
+
+      // Optional: flush the store to ensure clean state
+      await persistor.flush();
+
+      // Close menu and redirect
+      setShowMenu(false);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Create a void-returning wrapper for the onClick handler
+  const handleLogoutClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    void handleLogout(); // Explicitly void the promise
   };
   return (
     <header className="fixed top-0 left-0 w-full h-20 bg-gray-100 text-black shadow-md z-50 flex items-center justify-between px-6">
@@ -78,7 +97,7 @@ const Header = () => {
               </li>
               <li
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleClick()}
+                onClick={handleLogoutClick}
               >
                 Logout
               </li>
