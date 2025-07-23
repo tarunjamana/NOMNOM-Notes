@@ -19,6 +19,7 @@ type EditableSectionProps<T extends Record<string, unknown>> = {
   validationSchema?: Yup.ObjectSchema<Partial<T>>;
   editableConfig: Record<keyof T, boolean>;
   onSave: (values: T) => Promise<void> | void;
+  editButtonText?: string;
 };
 
 export const EditableSection = <T extends Record<string, unknown>>({
@@ -28,6 +29,7 @@ export const EditableSection = <T extends Record<string, unknown>>({
   validationSchema,
   editableConfig,
   onSave,
+  editButtonText,
 }: EditableSectionProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,18 +44,31 @@ export const EditableSection = <T extends Record<string, unknown>>({
   };
 
   return (
-    <div className="absolute top-5 right-6">
+    <div
+      className={`top-5 right-6 ${
+        editButtonText === null ? "absolute" : "flex items-center"
+      }`}
+    >
       <div className="flex justify-between items-center mb-4">
         {/* <h3 className="text-lg font-semibold text-gray-800">{title}</h3> */}
-        <button
-          onClick={() => setIsOpen(true)}
-          className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 
+        {editButtonText ? (
+          <button
+            className="bg-blue-500 hover:bg-blue-600 px-3 py-2 text-white text-sm font-medium rounded-lg cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
+            onClick={() => setIsOpen(true)}
+          >
+            {editButtonText}
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsOpen(true)}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 
                      rounded-full border border-blue-200 hover:border-blue-300 bg-blue-50 hover:bg-blue-100 
                      transition-colors duration-200"
-        >
-          <FiEdit2 className="w-4 h-4" />
-          <span>Edit</span>
-        </button>
+          >
+            <FiEdit2 className="w-4 h-4" />
+            <span>Edit</span>
+          </button>
+        )}
       </div>
       {/* Edit Dialog */}
       {isOpen && (

@@ -12,12 +12,8 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-
-// Define your root state type
-export type RootState = {
-  user: ReturnType<typeof userReducer>;
-  userProfile: ReturnType<typeof userProfileReducer>;
-};
+import { waterApi } from "./services/waterApi";
+import { weightTrackerApi } from "./services/weightTrackerApi";
 
 const persistConfig = {
   key: 'root',
@@ -29,10 +25,12 @@ const persistConfig = {
 const rootReducer = combineReducers({
   user: userReducer,
   userProfile: userProfileReducer,
+  [waterApi.reducerPath]: waterApi.reducer,
+  [weightTrackerApi.reducerPath]:weightTrackerApi.reducer
 });
 
-// Then persist the combined reducer
-const persistedReducer = persistReducer<RootState>(persistConfig, rootReducer);
+// ✅ Type-safe: Let TypeScript infer the type correctly
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const appStore = configureStore({
   reducer: persistedReducer,
@@ -41,11 +39,11 @@ export const appStore = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(waterApi.middleware).concat(weightTrackerApi.middleware),
 });
 
 export const persistor = persistStore(appStore);
 
-// Export the types
-
+// Infer the root state from the store itself
+export type RootState = ReturnType<typeof appStore.getState>;
 export type AppDispatch = typeof appStore.dispatch;
