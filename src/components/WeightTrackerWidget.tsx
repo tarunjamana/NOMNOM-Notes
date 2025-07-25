@@ -1,5 +1,8 @@
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
 import * as Yup from "yup";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getUserById } from "../helpers/fireStoreFuncs";
 import { EditableSection } from "./EditableSection";
 import {
   useLogWeightMutation,
@@ -14,8 +17,28 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { setUserProfile } from "../store/slices/userProfileSlice";
 
 const WeightTrackerWidget = () => {
+  const userData = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userData.isLoggedIn) {
+      void navigate("/");
+    }
+    const fetchUserData = async () => {
+      if (userData.uid) {
+        const user = await getUserById(userData.uid);
+        if (user) {
+          dispatch(setUserProfile(user));
+        }
+      }
+    };
+    void fetchUserData();
+  }, [userData.isLoggedIn, userData.uid, dispatch, navigate]);
+
   const userProfile = useAppSelector((store) => store.userProfile);
   const uid = userProfile.profile?.uid;
 
