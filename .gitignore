@@ -24,12 +24,7 @@ dist-ssr
 *.sw?
 
 
-# Firebase emulators or local state
-# Firebase
-.firebase/
-firebase-debug.log
-.firebaserc
-firebase.json
+
 
 # Do not commit environment variables
 .env
