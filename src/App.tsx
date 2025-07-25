@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
 import { PersistGate } from "redux-persist/integration/react";
-
+import FoodLogs from "./pages/FoodLogs";
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
   <>
     <Header />
@@ -39,6 +39,14 @@ const appRouter = createBrowserRouter([
     element: (
       <AppLayout>
         <Profile />
+      </AppLayout>
+    ),
+  },
+  {
+    path: "/food-log",
+    element: (
+      <AppLayout>
+        <FoodLogs />
       </AppLayout>
     ),
   },

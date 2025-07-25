@@ -9,3 +9,22 @@ export interface WeightEntry {
     loggedAt: string; //ISO date string
 }
 
+
+export type MealType = 'breakfast' | 'lunch' | 'snacks' | 'dinner';
+
+export interface FoodItem {
+    id: string;
+    name: string;
+    servingQty: number;
+    servingUnit: string;
+    calories: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    timeLogged: string;
+}
+  
+
+export interface APIFoodItem{
+    food_name: string;
+}

@@ -14,6 +14,7 @@ import {
 import storage from 'redux-persist/lib/storage';
 import { waterApi } from "./services/waterApi";
 import { weightTrackerApi } from "./services/weightTrackerApi";
+import { nutritionApi } from "./services/nutritionApi";
 
 const persistConfig = {
   key: 'root',
@@ -26,7 +27,8 @@ const rootReducer = combineReducers({
   user: userReducer,
   userProfile: userProfileReducer,
   [waterApi.reducerPath]: waterApi.reducer,
-  [weightTrackerApi.reducerPath]:weightTrackerApi.reducer
+  [weightTrackerApi.reducerPath]: weightTrackerApi.reducer,
+  [nutritionApi.reducerPath]: nutritionApi.reducer
 });
 
 // ✅ Type-safe: Let TypeScript infer the type correctly
@@ -39,7 +41,7 @@ export const appStore = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(waterApi.middleware).concat(weightTrackerApi.middleware),
+    }).concat(waterApi.middleware).concat(weightTrackerApi.middleware).concat(nutritionApi.middleware),
 });
 
 export const persistor = persistStore(appStore);

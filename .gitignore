@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Firebase emulators or local state
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+firebase.json
+
+# Do not commit environment variables
+.env
+.env.*  # in case you use variants like .env.local, .env.production
