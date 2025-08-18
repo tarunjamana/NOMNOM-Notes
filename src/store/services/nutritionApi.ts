@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
+import { NaturalFoodSearchResponse,BrandedFoodSearchResponse } from "../../types/health";
 const APP_ID = import.meta.env.VITE_NUTRITIONIX_APP_ID;
 const API_KEY = import.meta.env.VITE_NUTRITIONIX_API_KEY;
 
@@ -40,7 +40,23 @@ export const nutritionApi = createApi({
         method: "GET",
       }),
     }),
+    getNaturalSearchItem: builder.mutation<NaturalFoodSearchResponse, { query: string }>({
+      query: ({ query }) => ({
+        url: "natural/nutrients",
+        method: "POST",
+        body: { query },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    }),
+    getBrandedFood: builder.query<BrandedFoodSearchResponse, string>({
+      query: (nix_item_id: string) => ({
+        url: `search/item?nix_item_id=${nix_item_id}`,
+        method: "GET"
+      })
+    })
   }),
 });
 
-export const { useGetAutoSuggestionsQuery } = nutritionApi;
+export const { useGetAutoSuggestionsQuery , useGetNaturalSearchItemMutation , useGetBrandedFoodQuery , useLazyGetBrandedFoodQuery } = nutritionApi;

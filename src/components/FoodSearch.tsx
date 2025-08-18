@@ -1,15 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import { useGetAutoSuggestionsQuery } from "../store/services/nutritionApi";
 import { APIFoodItem } from "../types/health";
 
-const FoodSearch = () => {
+type Props = {
+  selected: APIFoodItem | null;
+  setSelected: (item: APIFoodItem) => void;
+  setIsOpen: (isOpen: boolean) => void;
+};
+
+const FoodSearch = ({ selected, setSelected, setIsOpen }: Props) => {
   const [input, setInput] = useState("");
   const debouncedSearchTerm = useDebounce(input, 300);
   const { data, isLoading, isError } = useGetAutoSuggestionsQuery(
     debouncedSearchTerm,
     { skip: debouncedSearchTerm.trim() === "" }
   );
+
+  function handleClick(item: APIFoodItem) {
+    setSelected(item);
+    setIsOpen(true);
+    setInput("");
+  }
+
+  useEffect(() => {
+    if (selected) {
+      console.log("updated selected State:", selected);
+    }
+  }, [selected]);
+
   return (
     <div className="w-full max-w-md mx-auto relative">
       <input
@@ -43,6 +62,7 @@ const FoodSearch = () => {
                 <li
                   key={item.food_name}
                   className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors"
+                  onClick={() => handleClick(item)}
                 >
                   {item.food_name}
                 </li>
@@ -54,6 +74,7 @@ const FoodSearch = () => {
                 <li
                   key={item.food_name}
                   className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors"
+                  onClick={() => handleClick(item)}
                 >
                   {item.food_name}
                 </li>
@@ -65,6 +86,8 @@ const FoodSearch = () => {
       {isError && (
         <p className="mt-2 text-sm text-red-600">Something went wrong.</p>
       )}
+
+      {/* {selected && (<div>{ cons }</div>)} */}
     </div>
   );
 };
